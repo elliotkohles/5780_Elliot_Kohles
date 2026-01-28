@@ -11,16 +11,12 @@ int main(void)
     /* Configure system clock */
     SystemClock_Config();
 
-    // =====================================================
-    // CLOCK ENABLE
-    // =====================================================
+    // Clock enable for GPIO ports
     // Enable GPIOC (LEDs) and GPIOA (USER button)
     RCC->AHBENR |= (1 << 19); // GPIOCEN
     RCC->AHBENR |= (1 << 17); // GPIOAEN
 
-    // =====================================================
-    // GPIOC: PC8 & PC9 OUTPUT (LEDs)
-    // =====================================================
+    // GPIO Configuration, output: PC8 (LD3), PC9 (LD4); input: PA0 (USER button)
 
     // MODER: 01 = output
     GPIOC->MODER &= ~((3 << (8 * 2)) | (3 << (9 * 2)));
@@ -39,10 +35,6 @@ int main(void)
     GPIOC->ODR |=  (1 << 8);
     GPIOC->ODR &= ~(1 << 9);
 
-    // =====================================================
-    // GPIOA: PA0 INPUT (USER BUTTON)
-    // =====================================================
-
     // MODER: 00 = input
     GPIOA->MODER &= ~(3 << (0 * 2));
 
@@ -53,9 +45,6 @@ int main(void)
     GPIOA->PUPDR &= ~(3 << (0 * 2));
     GPIOA->PUPDR |=  (2 << (0 * 2));
 
-    // =====================================================
-    // MAIN LOOP
-    // =====================================================
     while (1)
     {
         // If USER button pressed (PA0 high)
