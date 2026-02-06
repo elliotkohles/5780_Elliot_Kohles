@@ -14,9 +14,18 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
+  RCC->AHBENR |= RCC_AHBENR_GPIOCEN; // Enable GPIOC clock
+
+  GPIOC->MODER &= ~((3 <<(6 * 2)) | (3 <<(9 * 2))); // Clear bits PC6 and PC9
+  GPIOC->MODER |= ((1 <<(6 * 2)) | (1 << (9 * 2))); // Set bits to 01 (output mode)
+
+  GPIOC->ODR |= (1 << 9); // Set PC9 high (initial state)
+  GPIOC->ODR |= (1 << 6); // Set PC6 high (initial state)
+
   while (1)
   {
- 
+    GPIOC->ODR ^= (1 << 6); // Toggle PC6
+    HAL_Delay(400); // 1 second delay
   }
   return -1;
 }
