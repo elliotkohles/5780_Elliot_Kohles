@@ -5,6 +5,10 @@
 /******************************************************************************/
 /*           Cortex-M0 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
+
+volatile uint32_t tickCount = 0;
+volatile uint8_t ledState = 0;
+
 /**
   * @brief This function handles Non maskable interrupt.
   */
@@ -45,6 +49,20 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   HAL_IncTick();
+
+  tickCount++;
+
+  if(tickCount >= 200) {
+    tickCount = 0;
+    ledState ^= 1;
+    
+    if(ledState) {
+      GPIOC->ODR |= (1 << 7); //PC7 ON
+    }
+    else {
+      GPIOC->ODR &= ~(1 << 7); //PC7 OFF
+    }
+  }
 }
 
 /******************************************************************************/

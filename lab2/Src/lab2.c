@@ -16,8 +16,8 @@ int main(void)
 
   RCC->AHBENR |= RCC_AHBENR_GPIOCEN; // Enable GPIOC clock
 
-  GPIOC->MODER &= ~((3 <<(6 * 2)) | (3 <<(9 * 2))); // Clear bits PC6 and PC9
-  GPIOC->MODER |= ((1 <<(6 * 2)) | (1 << (9 * 2))); // Set bits to 01 (output mode)
+  GPIOC->MODER &= ~((3 << (6 * 2)) | (3 << (9 * 2)) | (3 << (7 * 2))); // Clear bits PC6(red), PC9(green), and PC7(blue)
+  GPIOC->MODER |= ((1 << (6 * 2)) | (1 << (9 * 2)) | (1 << (7 * 2))); // Set bits to 01 (output mode)
 
   GPIOC->ODR |= (1 << 9); // Set PC9(green) high (initial state)
   GPIOC->ODR |= (1 << 6); // Set PC6(red) high (initial state)
