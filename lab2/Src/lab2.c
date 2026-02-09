@@ -118,7 +118,11 @@ void HAL_GPIO_Configure_Rising_Edge_PA0(void) {
   // 2.4 Enable and set priority of the EXTI Interrupt
   // 
   NVIC_EnableIRQ(EXTI0_1_IRQn);
-  NVIC_SetPriority(EXTI0_1_IRQn, 1);
+
+  // For second checkoff, comment out 2 and 3, uncomment 1, and run it. Then Reverse it to show the different operations with different priorities.
+  //NVIC_SetPriority(EXTI0_1_IRQn, 1);
+  NVIC_SetPriority(SysTick_IRQn, 2);  // SysTick = medium
+  NVIC_SetPriority(EXTI0_1_IRQn, 3);  // EXTI = low
 }
 
 void EXTI0_1_IRQHandler() {
@@ -134,6 +138,24 @@ void EXTI0_1_IRQHandler() {
     currentState = 0;
     GPIOC->ODR |= (1 << 9);
     GPIOC->ODR &= ~(1 << 8);
+  }
+
+  // Checkoff 2: Long running delay
+  volatile uint32_t i;
+  for(i = 0; i < 1500000; i++) {
+    
+  }
+
+  // Toggle LEDs after delay
+  if(currentState) {
+    currentState = 0;
+    GPIOC->ODR |= (1 << 9);
+    GPIOC->ODR &= ~(1 << 8);
+  }
+  else {
+    currentState = 1;
+    GPIOC->ODR |= (1 << 8);
+    GPIOC->ODR &= ~(1 << 9);
   }
 }
 
