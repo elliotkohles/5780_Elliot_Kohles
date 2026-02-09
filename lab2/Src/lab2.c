@@ -105,6 +105,17 @@ void HAL_GPIO_Configure_Rising_Edge_PA0(void) {
   EXTI->RTSR |= (1 << 0);
   // We want to make sure this bit is zero
   EXTI->FTSR &= ~(1 << 0);
+
+  // 2.3 Setting the SYSCFG Pin Multiplexer
+  // It looks like EXTI0 has [3:0] in SYSCFG_EXTICR1
+  RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+  ASSERT((RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN) != 0);
+  SYSCFG->EXTICR[0] &= ~(0xF << 0);
+  ASSERT((SYSCFG->EXTICR[0] & 0xF) == 0);
+
+  // 2.4 Enable and set priority of the EXTI Interrupt
+  // 
+  NVIC_EnableIRQ(EXTI0_1_IRQn);
 }
 
 #ifdef USE_FULL_ASSERT
