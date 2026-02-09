@@ -14,10 +14,6 @@ int main(void)
     RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
     RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 
-    // ASSERT: GPIO clocks enabled
-    //ASSERT(RCC->AHBENR & (1 << 13));
-    //ASSERT(RCC->AHBENR & (1 << 15));
-
     // MODER: 01 = output
     // NOTE THE & ~ To Clear Bits First(this is a common way to initialize bits)
     // Ex. If I want to set bits 2 and 3 to 01, I first clear them with & ~(NOT) (11(mask) << 2(indexing))
@@ -25,15 +21,8 @@ int main(void)
     GPIOC->MODER &= ~((3 << (6 * 2)) | (3 << (7 * 2))); // Clear bits PC6 and PC7
     GPIOC->MODER |=  ((1 << (6 * 2)) | (1 << (7 * 2))); // Set bits to 01
 
-    // ASSERT: PC8 & PC9 output mode
-    //ASSERT(((GPIOC->MODER >> (6 * 2)) & 0x3) == 0x1);
-    //ASSERT(((GPIOC->MODER >> (7 * 2)) & 0x3) == 0x1);
-
     // OTYPER: push-pull
     GPIOC->OTYPER &= ~((1 << 6) | (1 << 7));
-
-    // ASSERT: push-pull
-   // ASSERT((GPIOC->OTYPER & ((1 << 6) | (1 << 7))) == 0);
 
     // OSPEEDR: low speed
     GPIOC->OSPEEDR &= ~((3 << (6 * 2)) | (3 << (7 * 2)));
@@ -53,21 +42,11 @@ int main(void)
     GPIOC->ODR |=  (1 << 6);
     GPIOC->ODR &= ~(1 << 7);
 
-    // ASSERT: correct initial LED state
-    //ASSERT(GPIOC->ODR & (1 << 6));
-    //ASSERT((GPIOC->ODR & (1 << 7)) == 0);
-
     // MODER: 00 = input
     GPIOA->MODER &= ~(3 << (0 * 2));
 
-    // ASSERT: PA0 input
-   // ASSERT(((GPIOA->MODER >> (0 * 2)) & 0x3) == 0x0);
-
     // OSPEEDR: low speed
     GPIOA->OSPEEDR &= ~(3 << (0 * 2));
-
-    // ASSERT: low speed
-    //ASSERT(((GPIOA->OSPEEDR >> (0 * 2)) & 0x3) == 0x0);
 
     // PUPDR: 10 = pull-down
     GPIOA->PUPDR &= ~(3 << (0 * 2));

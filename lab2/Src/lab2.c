@@ -1,6 +1,8 @@
 #include "main.h"
 #include "stm32f0xx_hal.h"
 
+#define ASSERT(cond) do { if (!(cond)) Error_Handler(); } while (0)
+
 void SystemClock_Config(void);
 
 /**
@@ -21,6 +23,13 @@ int main(void)
 
   GPIOC->ODR |= (1 << 9); // Set PC9(green) high (initial state)
   GPIOC->ODR |= (1 << 6); // Set PC6(red) high (initial state)
+
+  // Checkoff 2: Using the EXTI peripheral to generate interrupts with the user button.
+  ASSERT((EXTI->IMR & (1 << 0)) == 0);
+  HAL_GPIO_Configure_Rising_Edge_PA0();
+  ASSERT((EXTI->IMR & (1 << 0)) != 0);
+
+  SYSCFG->EXTICR[0] &= ~SYSCFG_EXTICR1_EXTI0; // 0000 = GPIOA
 
   while (1)
   {
@@ -76,6 +85,26 @@ void Error_Handler(void)
   while (1)
   {
   }
+}
+
+void HAL_GPIO_Configure_Rising_Edge_PA0(void) {
+
+  RCC->AHBENR |= RCC_AHBENR_GPIOAEN; // Enable user button
+  GPIOA->MODER &= ~(3 << (0 * 2)); // Set the user button to input
+  GPIOA->OSPEEDR &= ~(3 << (0 * 2)); // Set the speed to low
+
+  // PUPDR: 10 = pull-down, this is necessary to reduce noise in the system which can cause false triggers.
+  // Basically, the pull down resistor pulls the state to ground when the button is not being pressed.
+  GPIOA->PUPDR &= ~(3 << (0 * 2));
+  GPIOA->PUPDR |=  (2 << (0 * 2));
+
+  // EXTI_IMR, EXTI_FTSR, and EXTI_RTSR configuration
+  // For these registers we use |= because we want the values
+  // already in the register to stay the same.
+  EXTI->IMR |= (1 << 0);
+  EXTI->RTSR |= (1 << 0);
+  // We want to make sure this bit is zero
+  EXTI->FTSR &= ~(1 << 0);
 }
 
 #ifdef USE_FULL_ASSERT

@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void Error_Handler(void);
+void HAL_GPIO_Configure_Rising_Edge_PA0(void);
 
 #ifdef __cplusplus
 }
