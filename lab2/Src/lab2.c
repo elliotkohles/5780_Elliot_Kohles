@@ -5,6 +5,8 @@
 
 void SystemClock_Config(void);
 
+volatile uint8_t currentState = 0;
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -18,8 +20,8 @@ int main(void)
 
   RCC->AHBENR |= RCC_AHBENR_GPIOCEN; // Enable GPIOC clock
 
-  GPIOC->MODER &= ~((3 << (6 * 2)) | (3 << (9 * 2)) | (3 << (7 * 2))); // Clear bits PC6(red), PC9(green), and PC7(blue)
-  GPIOC->MODER |= ((1 << (6 * 2)) | (1 << (9 * 2)) | (1 << (7 * 2))); // Set bits to 01 (output mode)
+  GPIOC->MODER &= ~((3 << (6 * 2)) | (3 << (7 * 2)) | (3 << (8 * 2)) | (3 << (9 * 2))); // Clear bits PC6(red), PC7(blue), PC8(orange), and PC9(green).
+  GPIOC->MODER |= ((1 << (6 * 2)) | (1 << (7 * 2)) | (1 << (8 * 2)) | (1 << (9 * 2))); // Set bits to 01 (output mode)
 
   GPIOC->ODR |= (1 << 9); // Set PC9(green) high (initial state)
   GPIOC->ODR |= (1 << 6); // Set PC6(red) high (initial state)
@@ -117,6 +119,22 @@ void HAL_GPIO_Configure_Rising_Edge_PA0(void) {
   // 
   NVIC_EnableIRQ(EXTI0_1_IRQn);
   NVIC_SetPriority(EXTI0_1_IRQn, 1);
+}
+
+void EXTI0_1_IRQHandler() {
+  if(EXTI->PR & (1 << 0)) {
+    EXTI->PR = (1 << 0);
+  }
+  if(!currentState) {
+    currentState = 1;
+    GPIOC->ODR |= (1 << 8);
+    GPIOC->ODR &= ~(1 << 9);
+  }
+  else {
+    currentState = 0;
+    GPIOC->ODR |= (1 << 9);
+    GPIOC->ODR &= ~(1 << 8);
+  }
 }
 
 #ifdef USE_FULL_ASSERT
