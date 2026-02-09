@@ -116,6 +116,7 @@ void HAL_GPIO_Configure_Rising_Edge_PA0(void) {
   // 2.4 Enable and set priority of the EXTI Interrupt
   // 
   NVIC_EnableIRQ(EXTI0_1_IRQn);
+  NVIC_SetPriority(EXTI0_1_IRQn, 1);
 }
 
 #ifdef USE_FULL_ASSERT
